@@ -1,0 +1,12 @@
+git checkout develop
+git checkout -b feature/1.1-add-expense
+git checkout develop
+git checkout -b feature/1.2-edit-delete-expense
+git checkout develop
+git checkout -b feature/2.1-add-savings
+git checkout develop
+git checkout -b feature/2.2-edit-delete-savings
+git checkout develop
+git checkout -b feature/5.1-home-page-metrics
+git checkout develop
+git checkout -b feature/9.1-auth-login-signup
