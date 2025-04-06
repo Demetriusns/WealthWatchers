@@ -1,0 +1,35 @@
+from flask import Flask, render_template, request, redirect, url_for
+import sqlite3
+
+app = Flask(__name__)
+
+def init_db():
+    with sqlite3.connect("expenses.db") as conn:
+        conn.execute('''CREATE TABLE IF NOT EXISTS expenses (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            amount REAL,
+                            category TEXT,
+                            description TEXT,
+                            date TEXT)''')
+
+@app.route('/')
+def index():
+    with sqlite3.connect('expenses.db') as conn:
+        expenses = conn.execute("SELECT * FROM expenses").fetchall()
+    return render_template('index.html', expenses=expenses)
+
+@app.route('/add', methods=['POST'])
+def add_expense():
+    data = (
+        request.form['amount'],
+        request.form['category'],
+        request.form['description'],
+        request.form['date']
+    )
+    with sqlite3.connect('expenses.db') as conn:
+        conn.execute("INSERT INTO expenses (amount, category, description, date) VALUES (?, ?, ?, ?)", data)
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    init_db()
+    app.run(debug=True)
