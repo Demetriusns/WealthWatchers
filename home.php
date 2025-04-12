@@ -1,0 +1,71 @@
+<?php
+// For future real-time data SELECT SUM(amount) FROM savings WHERE user_id =....;
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WealthWachers - Home </title>
+    <link rel="stylesheet" href="WealthWatchersStyle.css">
+</head>
+<body>
+    <div class="header">
+        <h1>WealthWatchers Dashboard</h1>
+    </div>
+
+    <nav>
+        <a href="savings_add.php">Add Savings</a>
+        <a href="expenses_add.php">Add Expense</a>
+        <a href="accounts.php">Manage Accounts</a>
+        <a href="categories.php">Category Management</a>
+        <a href="user_management.php">User Management</a>
+        <a href="ai_forecast.php">Ask AI for Forecasts</a>
+    </nav>
+
+    <div class="container">
+
+        <h2>Financial Overview</h2>
+
+        <div class="card">
+            <h3>Total Net Worth</h3>
+            <p>$XX,XXX.XX (Assets - Liabilities)</p>
+            <!-- Replace with dynamic value from database -->
+        </div>
+
+        <div class="card">
+            <h3>Total Savings</h3>
+            <p>$XX,XXX.XX</p>
+            <!-- Replace with dynamic value from database -->
+        </div>
+
+        <div class="card">
+            <h3>Total Debt</h3>
+            <p>$XX,XXX.XX</p>
+            <!-- Replace with dynamic value from database -->
+        </div>
+
+        <div class="card">
+            <h3>Percent Saved This Month</h3>
+            <p>XX%</p>
+            <!-- Replace with dynamic value from database -->
+        </div>
+
+        <div class="card">
+            <h3>Percent Spent This Month</h3>
+            <p>XX%</p>
+            <!-- Replace with dynamic value from database -->
+        </div>
+
+        <div class="chart-container">
+            <h3>Trend Chart: Savings vs Expenses</h3>
+            <p>[Chart Placeholder - Connect to Chart.js or embed image]</p>
+        </div>
+
+        <div class="card">
+            <h3>AI Forecast</h3>
+            <p>[Estimated Date to Reach Goal:]</p>
+        </div>
+    </div>
+</body>
+</html>
