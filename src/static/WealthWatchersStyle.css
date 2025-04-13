@@ -1,0 +1,165 @@
+/* Global reset and Base Styles */
+*{
+    margin: 0;
+    padding:0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/*Layout Containers*/
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header, .footer {
+    background-color: #2f3e46;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+.header h1, .footer p {
+    margin: 0;
+}
+
+/*Navigation*/
+nav {
+    background-color: #354f52;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+nav a:hover {
+    background-color: #52796f;
+    border-radius: 5px;
+}
+
+/*Page Titles */
+h2 {
+    margin-bottom: 20px;
+    color: #2f3e46;
+}
+
+/*Forms*/
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+form label {
+    display: block;
+    margin-top:15px;
+    font-weight: bold; 
+}
+
+from input, form selct form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    margin-top: 20px;
+    background-color: #3a5a40;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #2d6a4f;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-bottom: 30px;
+}
+
+table th, table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #cad2c5;
+}
+/* Cards (for metrics, AI insights, etc.) */
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/*Charts*/
+.chart-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+/*Alerts and Notifications*/
+.alert{
+    padding: 15px;
+    background-color: #ffcccb;
+    color: #a94442;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/*Buttons*/
+.btn {
+    display: inline-block;
+    background-color: #354f52;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #52796f;
+}
+
+/*Responseive Design*/
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+
+    .chart-container {
+        max-width: 100%;
+    }
+    form input, form select, form textarea {
+        font-size: 14px;
+    }
+}

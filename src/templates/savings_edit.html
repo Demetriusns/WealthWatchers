@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Savings </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Edit Savings</h1>
+    </div>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+    </nav>
+
+    <div class="container">
+        <form method="POST">
+            <label for="amount">Amount:</label>
+            <input type="number" name="amount" value= "{{ saving.amount }}" step="0.01" required>
+
+            <label for="category_id">Category</label>
+            <select name="category_id" required>
+                {% for cat in categories %}
+                    <option value="{{ cat.category_id }}" {% if cat.category_id == saving.category_id %}selected{% endif %}>
+                        {{ cat.category_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="description">Description:</label>
+            <input type="text" name="description" value="{{ saving.description }}">
+
+            <label for="date">Date:</label>
+            <input type="date" name="date" value="{{ saving.date.strftime('%Y-%m-%d') }}" required>
+
+            <label for="account_id">Account</label>
+            <select name="account_id" required>
+                {% for acct in accounts %}
+                    <option value="{{ acct.account_id }}" {% if acct.account_id == saving.account_id %}selected{% endif %}>
+                        {{ acct.bank_name }} {{ acct.description }} ({{ acct.account_type }}) - ${{ acct.balance }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Update Savings</button>
+        </form>
+    </div>
+</body>
+</html>
