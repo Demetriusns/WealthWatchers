@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accounts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
+</head>
+<body>
+    <h1 class="page-title">Bank Accounts</h1>
+    <a href="{{ url_for('add_account') }}" class="btn btn-secondary">Add New Account</a>
+    <table class="table">
+        <thread>
+            <tr>
+                <th>Bank Name</th>
+                <th>Acount Type</th>
+                <th>Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thread>
+        <tbody>
+        {% for aount in accounts %}
+            <tr>
+                <td>{{ account.bank_name }}</td>
+                <td>{{ account.account_type }}</td>
+                <td>${{account.amount }}</td>
+                <td>
+                    <a href="{{ url_for('edit_account', account_id=account.id) }}" class="btn btn-sm btn-outline-info">Edit</a>
+                    <form method="POST" action="{{ url_for('delete_account', account_id=account.id) }}" class="inline-form">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}    
+        </tbody>
+    </table>
+</body>
+</html>

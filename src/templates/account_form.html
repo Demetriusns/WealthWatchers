@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if account %}Edit{% else %}Add{% endif %} Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
+</head>
+<body>
+    <h2 class="page-title">{% ifaccount %}Edit{% else%}Add{% end if %} Account</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Bank Name:</label>
+            <input type="text" name="bank_name" class="form-control" value="{{ account.bank_name if account else ''}}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Account Type:</label>
+            <input name="account_type" class="form-control" value="{{ acount.account_type if account else ''}}" required>
+        </div>  
+        
+        <div class="form-group">
+            <label>Amount:</label>
+            <input type="number" name="amount" step="0.01" class="form-control" value="{{ account.amount if account else '' }}" required>
+        </div>
+        
+        <input type="submit" value="Submit" class="btn btn-primary">
+    
+    </form>
+</body>
+</html>
