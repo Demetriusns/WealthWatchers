@@ -3,6 +3,16 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+#class User(db.Model):
+#    __tablename__ = 'users'
+#    user_id = db.Column(db.Integer, primary_key=True)
+#    email = db.Column(db.String(120), unique=True, nullable=False)
+#    password = db.Column(db.String(120), nullable=False)
+#    role = db.Column(db.String(50), nullable=False)
+
+#    def __repr__(self):
+#        return f"<User {self.email}, Role: {self.role}>"
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     user_id = db.Column(db.Integer, primary_key=True)
@@ -12,9 +22,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.Enum('Admin', 'User', name='user_roles'), nullable=False, default='User')
     def __repr__(self):
         return f"<User {self.email}, Role: {self.role}>"
-    
-    def get_id(self):
-        return str(self.user_id)
+
 
 class Account(db.Model):
     __tablename__ = 'accounts'
