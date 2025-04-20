@@ -261,6 +261,25 @@ def savings_view():
     user_id = 1  # Replace with session later
     savings = Saving.query.all()
     return render_template("savings_page.html", savings=savings)
+
+@app.route('/accounts', methods=['GET'])
+@login_required
+def account_manage():
+    user_id = current_user.user_id
+    accounts = Account.query.filter_by(user_id=user_id).all()
+    return render_template("accounts_page.html", accounts=accounts)
+
+@app.route('/account/delete/<int:account_id>', methods=['POST'])
+@login_required
+def delete_account(account_id):
+    account = Account.query.get_or_404(account_id)
+    if account.user_id != current_user.user_id:
+        flash("Unauthorized", "danger")
+        return redirect(url_for('account_manage'))
+    db.session.delete(account)
+    db.session.commit()
+    return redirect(url_for('account_manage'))
+
 # @app.route("/savings")
 # def savings_view():
 #     user_id = 1  # Replace with session later

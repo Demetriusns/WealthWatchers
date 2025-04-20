@@ -18,19 +18,19 @@
             </tr>
         </thread>
         <tbody>
-        {% for aount in accounts %}
-            <tr>
-                <td>{{ account.bank_name }}</td>
-                <td>{{ account.account_type }}</td>
-                <td>${{account.amount }}</td>
-                <td>
-                    <a href="{{ url_for('edit_account', account_id=account.id) }}" class="btn btn-sm btn-outline-info">Edit</a>
-                    <form method="POST" action="{{ url_for('delete_account', account_id=account.id) }}" class="inline-form">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}    
+            {% for account in accounts %}
+                <tr>
+                    <td>{{ account.bank_name }}</td>
+                    <td>{{ account.account_type }}</td>
+                    <td>${{ account.balance }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_account', account_id=account.account_id) }}" class="btn btn-sm btn-outline-info">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_account', account_id=account.account_id) }}" class="inline-form">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 </body>
