@@ -69,8 +69,8 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        print("User get_id():", user)  
-        print("User Password:", user.password)  
+        print("User get_id():", user)
+        print("User Password:", user.password)
         if user.email and check_password_hash(user.password, form.password.data):
             login_user(user)
             print("User logged in:", current_user.is_authenticated)
@@ -181,7 +181,7 @@ def savings_add():
 
     if request.method == 'POST':
 
-        amount = Decimal(request.form['amount']) 
+        amount = Decimal(request.form['amount'])
         category_id = request.form['category_id']
         description = request.form['description']
         date = request.form['date']
@@ -220,7 +220,7 @@ def savings_add():
 @login_required
 def savings_edit(savings_id):
     #user_id = 1  # Replace with session["user_id"] once login is implemented
-    
+
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
 
@@ -300,27 +300,6 @@ def delete_account(account_id):
     db.session.delete(account)
     db.session.commit()
     return redirect(url_for('account_manage'))
-
-@app.route('/account/edit/<int:account_id>', methods=['GET', 'POST'])
-@login_required
-def edit_account(account_id):
-    account = Account.query.get_or_404(account_id)
-
-    # Make sure this account belongs to the logged-in user
-    if account.user_id != current_user.user_id:
-        flash("Unauthorized", "danger")
-        return redirect(url_for('account_manage'))
-
-    if request.method == 'POST':
-        account.bank_name = request.form['bank_name']
-        account.account_type = request.form['account_type']
-        account.balance = float(request.form['balance'])
-        account.description = request.form.get('description', '')
-        db.session.commit()
-        return redirect(url_for('account_manage'))
-
-    return render_template('account_form.html', account=account)
-
 
 # @app.route("/savings")
 # def savings_view():

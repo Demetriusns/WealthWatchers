@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Categories</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='wealthwatchersStyle.css') }}">
+</head>
+<body>
+  <nav>
+      <a href="{{ url_for('home') }}">Home</a>
+      <a href="{{ url_for('savings_add') }}">Add Savings</a>
+      <a href="{{ url_for('savings_view') }}">Edit Savings</a>
+      <a href="{{ url_for('account_manage') }}">Manage Accounts</a>
+      <a href="{{ url_for('category_manage') }}">Categories</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+
+
+    <!-- {#
+      <a href="{{ url_for('expense_add') }}">Add Expense</a>
+      <a href="{{ url_for('expense_edit') }}">Edit Expense</a>
+      <a href="{{ url_for('expense_edit') }}">Category Management</a>
+      <a href="{{ url_for('user_management') }}">User Management</a>
+      <a href="{{ url_for('ai_forecast') }}">Ask AI for Forecasts</a>
+    #} -->
+
+  </nav>
+    <div class="container">
+        <h2>Your Categories</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for message, category in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- List of categories -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.category_name }}</td>
+                    <td>{{ category.description or "No description" }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_category', category_id=category.category_id) }}" method="POST" style="display:inline;">
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Form to add a category -->
+        <h2>Add a New Category</h2>
+        <form method="POST">
+            <label for="category_name">Category Name:</label>
+            <input type="text" id="category_name" name="category_name" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description"></textarea>
+
+            <button type="submit">Add Category</button>
+        </form>
+    </div>
+</body>
+</html>
