@@ -301,6 +301,25 @@ def delete_account(account_id):
     db.session.commit()
     return redirect(url_for('account_manage'))
 
+@app.route('/account/edit/<int:account_id>', methods=['GET', 'POST'])
+@login_required
+def edit_account(account_id):
+    account = Account.query.get_or_404(account_id)
+
+    # Make sure this account belongs to the logged-in user
+    if account.user_id != current_user.user_id:
+        flash("Unauthorized", "danger")
+        return redirect(url_for('account_manage'))
+
+    if request.method == 'POST':
+        account.bank_name = request.form['bank_name']
+        account.account_type = request.form['account_type']
+        account.balance = float(request.form['balance'])
+        account.description = request.form.get('description', '')
+        db.session.commit()
+        return redirect(url_for('account_manage'))
+
+    return render_template('account_form.html', account=account)
 
 @app.route('/categories', methods=['GET', 'POST'])
 @login_required
