@@ -262,28 +262,26 @@ def savings_view():
     savings = Saving.query.all()
     return render_template("savings_page.html", savings=savings)
 
-@app.route("/account/add", methods=["GET", "POST"])
+@app.route("/account/add", methods=["POST"])
 @login_required
 def add_account():
-    if request.method == "POST":
-        bank_name = request.form["bank_name"]
-        account_type = request.form["account_type"]
-        balance = float(request.form["balance"])
-        description = request.form.get("description", "")
+    bank_name = request.form['bank_name']
+    account_type = request.form['account_type']
+    balance = float(request.form['balance'])
+    description = request.form.get('description', '')
 
-        new_account = Account(
-            bank_name=bank_name,
-            account_type=account_type,
-            balance=balance,
-            description=description,
-            user_id=current_user.user_id
-        )
+    new_account = Account(
+        bank_name=bank_name,
+        account_type=account_type,
+        balance=balance,
+        description=description,
+        user_id=current_user.user_id
+    )
 
-        db.session.add(new_account)
-        db.session.commit()
-        return redirect(url_for("account_manage"))
+    db.session.add(new_account)
+    db.session.commit()
+    return redirect(url_for('account_manage'))
 
-    return render_template("account_form.html", account=None)
 
 @app.route('/accounts', methods=['GET'])
 @login_required

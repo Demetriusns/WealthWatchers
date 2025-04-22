@@ -2,36 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Accounts</title>
+    <title>Manage Accounts</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
 </head>
 <body>
-    <h1 class="page-title">Bank Accounts</h1>
-    <a href="{{ url_for('add_account') }}" class="btn btn-secondary">Add New Account</a>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('savings_add') }}">Add Savings</a>
+        <a href="{{ url_for('savings_view') }}">Edit Savings</a>
+        <a href="{{ url_for('account_manage') }}">Manage Accounts</a>
+        <a href="{{ url_for('category_manage') }}">Categories</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+
+    <h1 class="page-title">Your Bank Accounts</h1>
     <table class="table">
-        <thread>
+        <thead>
             <tr>
                 <th>Bank Name</th>
-                <th>Acount Type</th>
+                <th>Account Type</th>
                 <th>Amount</th>
                 <th>Actions</th>
             </tr>
-        </thread>
+        </thead>
         <tbody>
-            {% for account in accounts %}
-                <tr>
-                    <td>{{ account.bank_name }}</td>
-                    <td>{{ account.account_type }}</td>
-                    <td>${{ account.balance }}</td>
-                    <td>
-                        <a href="{{ url_for('edit_account', account_id=account.account_id) }}" class="btn btn-sm btn-outline-info">Edit</a>
-                        <form method="POST" action="{{ url_for('delete_account', account_id=account.account_id) }}" class="inline-form">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
+        {% for account in accounts %}
+            <tr>
+                <td>{{ account.bank_name }}</td>
+                <td>{{ account.account_type }}</td>
+                <td>${{ account.balance }}</td>
+                <td>
+                    <a href="{{ url_for('edit_account', account_id=account.account_id) }}" class="btn btn-sm btn-outline-info">Edit</a>
+                    <form method="POST" action="{{ url_for('delete_account', account_id=account.account_id) }}" class="inline-form">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4">No accounts found.</td></tr>
+        {% endfor %}
         </tbody>
     </table>
+
+    <h2 class="section-title">Add a New Account</h2>
+    <form method="POST" action="{{ url_for('add_account') }}" class="form-section">
+        <div class="form-group">
+            <label for="bank_name">Bank Name:</label>
+            <input type="text" name="bank_name" id="bank_name" required>
+        </div>
+        <div class="form-group">
+            <label for="account_type">Account Type:</label>
+            <select name="account_type" id="account_type" required>
+                <option value="Asset">Asset</option>
+                <option value="Liability">Liability</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="balance">Amount:</label>
+            <input type="number" name="balance" step="0.01" id="balance" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description (optional):</label>
+            <textarea name="description" id="description"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Account</button>
+    </form>
 </body>
 </html>
