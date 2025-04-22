@@ -301,6 +301,43 @@ def delete_account(account_id):
     db.session.commit()
     return redirect(url_for('account_manage'))
 
+
+@app.route('/categories', methods=['GET', 'POST'])
+@login_required
+def category_manage():
+    if request.method == 'POST':
+        # Handle adding a new category
+        new_category_name = request.form.get('category_name')
+        new_description = request.form.get('description')
+
+        if new_category_name:
+            new_category = Category(
+                category_name=new_category_name,
+                description=new_description,
+                user_id=current_user.user_id
+            )
+            db.session.add(new_category)
+            db.session.commit()
+            flash('Category added successfully!', 'success')
+            return redirect(url_for('categories'))
+
+    user_categories = Category.query.filter_by(user_id=current_user.user_id).all()
+
+    return render_template('categories.html', categories=user_categories)
+
+@app.route('/delete_category/<int:category_id>', methods=['POST'])
+@login_required
+def delete_category(category_id):
+    category = Category.query.filter_by(category_id=category_id, user_id=current_user.user_id).first()
+    if category:
+        db.session.delete(category)
+        db.session.commit()
+        flash('Category deleted successfully.', 'success')
+    else:
+        flash('Category not found or not authorized.', 'error')
+
+    return redirect(url_for('categories'))
+
 # @app.route("/savings")
 # def savings_view():
 #     user_id = 1  # Replace with session later
