@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
 </head>
 <body>
-    <h2 class="page-title">{% ifaccount %}Edit{% else%}Add{% end if %} Account</h2>
+    <h2 class="page-title">{% if account %}Edit{% else %}Add{% endif %} Account</h2>
     <form method="POST">
         <div class="form-group">
             <label>Bank Name:</label>
