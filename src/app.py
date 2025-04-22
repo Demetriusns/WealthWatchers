@@ -69,8 +69,8 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        print("User get_id():", user)  
-        print("User Password:", user.password)  
+        print("User get_id():", user)
+        print("User Password:", user.password)
         if user.email and check_password_hash(user.password, form.password.data):
             login_user(user)
             print("User logged in:", current_user.is_authenticated)
@@ -181,7 +181,7 @@ def savings_add():
 
     if request.method == 'POST':
 
-        amount = Decimal(request.form['amount']) 
+        amount = Decimal(request.form['amount'])
         category_id = request.form['category_id']
         description = request.form['description']
         date = request.form['date']
@@ -220,7 +220,7 @@ def savings_add():
 @login_required
 def savings_edit(savings_id):
     #user_id = 1  # Replace with session["user_id"] once login is implemented
-    
+
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
 
@@ -300,6 +300,43 @@ def delete_account(account_id):
     db.session.delete(account)
     db.session.commit()
     return redirect(url_for('account_manage'))
+
+
+@app.route('/categories', methods=['GET', 'POST'])
+@login_required
+def category_manage():
+    if request.method == 'POST':
+        # Handle adding a new category
+        new_category_name = request.form.get('category_name')
+        new_description = request.form.get('description')
+
+        if new_category_name:
+            new_category = Category(
+                category_name=new_category_name,
+                description=new_description,
+                user_id=current_user.user_id
+            )
+            db.session.add(new_category)
+            db.session.commit()
+            flash('Category added successfully!', 'success')
+            return redirect(url_for('categories'))
+
+    user_categories = Category.query.filter_by(user_id=current_user.user_id).all()
+
+    return render_template('categories.html', categories=user_categories)
+
+@app.route('/delete_category/<int:category_id>', methods=['POST'])
+@login_required
+def delete_category(category_id):
+    category = Category.query.filter_by(category_id=category_id, user_id=current_user.user_id).first()
+    if category:
+        db.session.delete(category)
+        db.session.commit()
+        flash('Category deleted successfully.', 'success')
+    else:
+        flash('Category not found or not authorized.', 'error')
+
+    return redirect(url_for('categories'))
 
 # @app.route("/savings")
 # def savings_view():
