@@ -8,6 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 from db import db, User, Account, Saving, Category, Expense
 from forms import LoginForm  # If LoginForm is in forms.py
 from decimal import Decimal
+from functools import wraps
+
 
 # from flask_wtf import FlaskForm
 # from wtforms.validators import DataRequired, Length, Email, EqualTo
@@ -366,6 +368,36 @@ def delete_category(category_id):
             return jsonify({'success': True, 'category_name': category_name})
 
     return redirect(url_for('category_manage'))
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            flash("Admin access required.", "danger")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/admin')
+@login_required
+@admin_required
+def admin_dashboard():
+    users = User.query.all()
+    return render_template('admin.html', users=users)
+
+
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        flash(f"User '{user.email}' has been deleted.", "success")
+    else:
+        flash("User not found.", "warning")
+    return redirect(url_for('admin_dashboard'))
 
 # @app.route("/savings")
 # def savings_view():

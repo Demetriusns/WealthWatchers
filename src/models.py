@@ -11,6 +11,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(20), nullable=False)    
     firstname = db.Column(db.String(20)) 
     lastname = db.Column(db.String(20)) 
+    is_admin = db.Column(db.Boolean, default=False) 
 
     # def get_id(self):
     #     return str(self.email)
