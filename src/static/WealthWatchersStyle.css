@@ -69,7 +69,7 @@ form {
 form label {
     display: block;
     margin-top:15px;
-    font-weight: bold; 
+    font-weight: bold;
 }
 
 from input, form selct form textarea {
@@ -144,10 +144,43 @@ table th {
     padding: 10px 15px;
     border-radius: 5px;
     text-decoration: none;
+    margin-top: 5px; 
 }
 
 .btn:hover {
     background-color: #52796f;
+}
+
+#toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    max-width: 300px;  /* Optional: Define a max width for the container */
+    width: 100%;
+}
+
+.toast {
+    background-color: #d4edda;
+    color: #333;
+    padding: 12px 20px;
+    margin-top: 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid #32CD32;
+    opacity: 0;
+    visibility: hidden;
+    font-size: 16px;
+    animation: fadeInOut 5s forwards;
+}
+
+.delete-category-form {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
 }
 
 /*Responseive Design*/
@@ -163,3 +196,11 @@ table th {
         font-size: 14px;
     }
 }
+
+/*For the toast container*/
+@keyframes fadeInOut {
+    0% { opacity: 0; visibility: hidden; }  /* Hidden and invisible */
+    10% { opacity: 1; visibility: visible; } /* Fully visible */
+    90% { opacity: 1; visibility: visible; } /* Stay visible */
+    100% { opacity: 0; visibility: hidden; } /* Fade out and hide */
+  }

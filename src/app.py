@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, request, flash
+from flask import Flask, render_template, session, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField,SubmitField, SelectField
@@ -325,7 +325,6 @@ def edit_account(account_id):
 @login_required
 def category_manage():
     if request.method == 'POST':
-        # Handle adding a new category
         new_category_name = request.form.get('category_name')
         new_description = request.form.get('description')
 
@@ -337,11 +336,21 @@ def category_manage():
             )
             db.session.add(new_category)
             db.session.commit()
-            flash('Category added successfully!', 'success')
-            return redirect(url_for('categories'))
+
+            # If AJAX request, return JSON
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({
+                    'success': True,
+                    'category': {
+                        'category_name': new_category.category_name,
+                        'description': new_category.description or "No description",
+                        'category_id': new_category.category_id
+                    }
+                })
+
+            return redirect(url_for('category_manage'))
 
     user_categories = Category.query.filter_by(user_id=current_user.user_id).all()
-
     return render_template('categories.html', categories=user_categories)
 
 @app.route('/delete_category/<int:category_id>', methods=['POST'])
@@ -349,13 +358,14 @@ def category_manage():
 def delete_category(category_id):
     category = Category.query.filter_by(category_id=category_id, user_id=current_user.user_id).first()
     if category:
+        category_name = category.category_name
         db.session.delete(category)
         db.session.commit()
-        flash('Category deleted successfully.', 'success')
-    else:
-        flash('Category not found or not authorized.', 'error')
 
-    return redirect(url_for('categories'))
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'category_name': category_name})
+
+    return redirect(url_for('category_manage'))
 
 # @app.route("/savings")
 # def savings_view():
