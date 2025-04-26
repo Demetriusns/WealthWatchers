@@ -144,7 +144,7 @@ table th {
     padding: 10px 15px;
     border-radius: 5px;
     text-decoration: none;
-    margin-top: 5px; 
+    margin-top: 5px;
 }
 
 .btn:hover {
@@ -172,7 +172,7 @@ table th {
     opacity: 0;
     visibility: hidden;
     font-size: 16px;
-    animation: fadeInOut 5s forwards;
+    animation: fadeInOut 2s forwards;
 }
 
 .delete-category-form {
@@ -199,8 +199,20 @@ table th {
 
 /*For the toast container*/
 @keyframes fadeInOut {
-    0% { opacity: 0; visibility: hidden; }  /* Hidden and invisible */
-    10% { opacity: 1; visibility: visible; } /* Fully visible */
-    90% { opacity: 1; visibility: visible; } /* Stay visible */
-    100% { opacity: 0; visibility: hidden; } /* Fade out and hide */
+  0% {
+    opacity: 0;
+    visibility: visible; /* Change to visible here */
   }
+  10% {
+    opacity: 1;
+    visibility: visible;
+  }
+  90% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

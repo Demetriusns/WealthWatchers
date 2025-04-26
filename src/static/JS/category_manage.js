@@ -14,9 +14,11 @@ function showToast(message, isDelete = false) {
     toast.textContent = message;
     toastContainer.appendChild(toast);
 
+    void toast.offsetHeight;
+
     setTimeout(() => {
         toast.remove();
-    }, 5000);
+    }, 2000);
 }
 
 function handleDeleteForm(e) {
