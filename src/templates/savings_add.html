@@ -36,7 +36,7 @@
                 <select name="account_id" required>
                 <option value="" disabled selected>Select an Account</option>
                 {% for acct in accounts %}
-                    <option value="{{ acct.account_id }}">{{ acct.bank_name }} {{acct.description}} ({{ acct.account_type }}) - ${{ acct.balance }}</option>
+                    <option value="{{ acct.account_id }}">{{ acct.bank_name }} {{acct.description}} - ${{ acct.balance }}</option>
                 {% endfor %}
                 </select>
 

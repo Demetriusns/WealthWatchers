@@ -106,7 +106,7 @@ def home():
         .filter(Account.account_type == 'Liability', Account.user_id == user_id).scalar() or 0
 
     # Calculate net worth
-    net_worth = total_assets - total_liabilities
+    net_worth = total_assets + total_liabilities
 
     # Format values with commas and two decimal places
     formatted_net_worth = "{:,.2f}".format(net_worth)
@@ -171,8 +171,7 @@ def add_expense():
 @app.route('/savings_add', methods=['GET', 'POST'])
 @login_required
 def savings_add():
-    # TODO: Replace hardcoded user_id with session["user_id"] once login is implemented
-    #user_id = 1
+
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
 
@@ -206,7 +205,7 @@ def savings_add():
                 selected_account.balance += amount
             elif selected_account.account_type == 'Liability':
 
-                selected_account.balance -= amount
+                selected_account.balance += amount
 
             db.session.commit()
 
@@ -221,7 +220,6 @@ def savings_add():
 @app.route('/savings_edit/<int:savings_id>', methods=['GET', 'POST'])
 @login_required
 def savings_edit(savings_id):
-    #user_id = 1  # Replace with session["user_id"] once login is implemented
 
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
@@ -259,9 +257,11 @@ def savings_edit(savings_id):
 
 
 @app.route("/savings")
+@login_required
 def savings_view():
-    user_id = 1  # Replace with session later
-    savings = Saving.query.all()
+    #user_id = 1  # Replace with session later
+    #savings = Saving.query.all()
+    savings = db.session.query(Saving).join(Account).filter(Account.user_id == current_user.user_id).all()
     return render_template("savings_page.html", savings=savings)
 
 @app.route("/account/add", methods=["POST"])
