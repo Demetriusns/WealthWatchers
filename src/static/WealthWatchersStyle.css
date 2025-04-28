@@ -183,6 +183,93 @@ table th {
   background: none;
 }
 
+/* Notifications Styles */
+.notifications-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.notification-list {
+    list-style: none;
+    padding: 0;
+}
+
+.notification-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.notification-card.unread {
+    background-color: #f1f8f6; /* Lighter background for unread */
+    border-left: 5px solid #2d6a4f; /* Green bar on left side for unread */
+}
+
+.notification-card .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.notification-card .notification-header strong {
+    font-size: 1.2em;
+    color: #354f52;
+}
+
+.notification-card .notification-header .timestamp {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.notification-card .message {
+    color: #333;
+    font-size: 1em;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.mark-read-btn {
+    background-color: #354f52;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.mark-read-btn:hover {
+    background-color: #52796f;
+}
+
+/* Hover effect for cards */
+.notification-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* For smaller screens */
+@media (max-width: 768px) {
+    .notifications-container {
+        padding: 15px;
+    }
+
+    .notification-card .notification-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .notification-card .notification-header strong {
+        margin-bottom: 5px;
+    }
+}
+
 /*Responseive Design*/
 @media (max-width: 768px) {
     nav {

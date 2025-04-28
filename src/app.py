@@ -5,10 +5,12 @@ from wtforms import StringField, PasswordField,SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from db import db, User, Account, Saving, Category, Expense
+from db import db, User, Account, Saving, Category, Expense, Notification
 from forms import LoginForm  # If LoginForm is in forms.py
 from decimal import Decimal
 from functools import wraps
+from datetime import datetime
+from sqlalchemy import func
 
 
 # from flask_wtf import FlaskForm
@@ -90,12 +92,14 @@ def home():
     #if "user_id" not in session:
     #        return redirect(url_for("login"))
 
-    # TODO: Replace hardcoded user_id with session["user_id"] once login is implemented
+    # TODO: Replace hardcoded user_id with session["user_id"] once login is implemente
 
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
 
     user_id = current_user.user_id
+
+    unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
 
     # Sum of all asset accounts for this user
     total_assets = db.session.query(db.func.sum(Account.balance)) \
@@ -115,7 +119,8 @@ def home():
 
     return render_template("home.html", net_worth=formatted_net_worth,
                            total_assets=formatted_assets,
-                           total_liabilities=formatted_liabilities)
+                           total_liabilities=formatted_liabilities,
+                           unread_count=unread_count)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -299,8 +304,15 @@ def delete_account(account_id):
     if account.user_id != current_user.user_id:
         flash("Unauthorized", "danger")
         return redirect(url_for('account_manage'))
+
+
+    Saving.query.filter_by(account_id=account_id).delete()
+
+
     db.session.delete(account)
     db.session.commit()
+
+    flash("Account and related savings deleted successfully.", "success")
     return redirect(url_for('account_manage'))
 
 @app.route('/account/edit/<int:account_id>', methods=['GET', 'POST'])
@@ -398,6 +410,64 @@ def delete_user(user_id):
     else:
         flash("User not found.", "warning")
     return redirect(url_for('admin_dashboard'))
+
+@app.route('/notifications', methods=['GET', 'POST'])
+@login_required
+def notifications():
+    user_id = current_user.user_id
+
+    # Fetch notifications for the user
+    notifications = Notification.query.filter_by(user_id=user_id).order_by(Notification.timestamp.desc()).all()
+
+    # Get the unread notification count
+    unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
+
+    # Get all account_ids for the current user
+    account_ids = db.session.query(Account.account_id).filter_by(user_id=user_id).all()
+    account_ids = [account_id[0] for account_id in account_ids]  # Extracting account_ids into a list
+
+    # Get total savings for the current month (from all accounts associated with the user)
+    total_savings = db.session.query(func.sum(Saving.amount)).filter(
+        Saving.account_id.in_(account_ids),  # Filter by all account_ids for the user
+        db.extract('month', Saving.date) == db.extract('month', func.current_date())
+    ).scalar() or 0
+
+    # Get total expenses for the current month (from all accounts associated with the user)
+    total_expenses = db.session.query(func.sum(Expense.amount)).filter(
+        Expense.account_id.in_(account_ids),  # Filter by all account_ids for the user
+        db.extract('month', Expense.date) == db.extract('month', func.current_date())
+    ).scalar() or 0
+
+    # If expenses exceed savings, create a notification
+    if total_expenses > total_savings:
+        notification = Notification(
+            user_id=user_id,
+            title="Expense Alert",
+            message="Your expenses have exceeded your savings for this month!",
+            timestamp=datetime.utcnow()
+        )
+        db.session.add(notification)
+        db.session.commit()
+
+    # Fetch notifications for the user
+    notifications = Notification.query.filter_by(user_id=user_id).order_by(Notification.timestamp.desc()).all()
+
+    return render_template('notification.html', notifications=notifications, unread_count=unread_count)
+
+
+@app.route('/mark_as_read/<int:notification_id>', methods=['POST'])
+@login_required
+def mark_as_read(notification_id):
+    # Mark the notification as read
+    notification = Notification.query.get(notification_id)
+    if notification and notification.user_id == current_user.user_id:
+        notification.is_read = True
+        db.session.commit()
+
+    # Get the count of unread notifications
+    unread_count = Notification.query.filter_by(user_id=current_user.user_id, is_read=False).count()
+
+    return jsonify({'unread_count': unread_count})
 
 # @app.route("/savings")
 # def savings_view():

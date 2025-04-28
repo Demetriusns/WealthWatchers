@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 from flask_login import UserMixin
 
 db = SQLAlchemy()
@@ -10,10 +11,10 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(20), nullable=False)
     create_time = db.Column(db.String(20), nullable=False)
     role = db.Column(db.Enum('Admin', 'User', name='user_roles'), nullable=False, default='User')
-    is_admin = db.Column(db.Boolean, default=False) 
+    is_admin = db.Column(db.Boolean, default=False)
     def __repr__(self):
         return f"<User {self.email}, Role: {self.role}>"
-    
+
     def get_id(self):
         return str(self.user_id)
 
@@ -81,3 +82,18 @@ class Expense(db.Model):
 
     def __repr__(self):
         return f"<Expense {self.expense_id}, Amount: {self.amount}, Date: {self.date}>"
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'  # match your SQL table name
+
+    notification_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to User table
+    title = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+
+    def __repr__(self):
+        return f"<Notification {self.notification_id} - User {self.user_id}>"
