@@ -295,7 +295,8 @@ def add_account():
 def account_manage():
     user_id = current_user.user_id
     accounts = Account.query.filter_by(user_id=user_id).all()
-    return render_template("accounts_page.html", accounts=accounts)
+    unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
+    return render_template("accounts_page.html", accounts=accounts,  unread_count=unread_count)
 
 @app.route('/account/delete/<int:account_id>', methods=['POST'])
 @login_required
@@ -338,6 +339,10 @@ def edit_account(account_id):
 @app.route('/categories', methods=['GET', 'POST'])
 @login_required
 def category_manage():
+
+    user_id = current_user.user_id
+    unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
+
     if request.method == 'POST':
         new_category_name = request.form.get('category_name')
         new_description = request.form.get('description')
@@ -365,7 +370,7 @@ def category_manage():
             return redirect(url_for('category_manage'))
 
     user_categories = Category.query.filter_by(user_id=current_user.user_id).all()
-    return render_template('categories.html', categories=user_categories)
+    return render_template('categories.html', categories=user_categories,  unread_count=unread_count)
 
 @app.route('/delete_category/<int:category_id>', methods=['POST'])
 @login_required

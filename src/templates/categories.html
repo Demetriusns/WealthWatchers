@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='wealthwatchersStyle.css') }}">
 </head>
 <body>
+  <div class="header">
+      <h1>Your Categories</h1>
+  </div>
+
   <div id="toast-container"></div>
   <nav>
     <a href="{{ url_for('home') }}">Home</a>
@@ -13,11 +17,11 @@
     <a href="{{ url_for('savings_view') }}">Edit Savings</a>
     <a href="{{ url_for('account_manage') }}">Manage Accounts</a>
     <a href="{{ url_for('category_manage') }}">Categories</a>
+    <a href="{{ url_for('notifications') }}">Notifications <span id="unread-count">{{ unread_count }}</span></a>
     <a href="{{ url_for('logout') }}">Logout</a>
   </nav>
 
   <div class="container">
-    <h2>Your Categories</h2>
     <table>
       <thead>
         <tr>
