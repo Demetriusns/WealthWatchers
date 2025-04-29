@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Event</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Event</h1>
+        <form method="POST">
+            <label for="amount">Amount (positive for savings, negative for expense):</label>
+            <input type="number" name="amount" step="0.01" required>
+
+            <label for="description">Description:</label>
+            <input type="text" name="description" required>
+
+            <label for="date">Date:</label>
+            <input type="date" name="date" required>
+
+            <label for="account">Account:</label>
+            <select name="account_id" required>
+                {% for account in accounts %}
+                    <option value="{{ account.id }}">{{ account.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Submit</button>
+        </form>
+        <br>
+        <a href="{{ url_for('home') }}">Back to Home</a>
+    </div>
+</body>
+</html>
