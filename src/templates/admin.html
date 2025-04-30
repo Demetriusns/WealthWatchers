@@ -8,14 +8,7 @@
     <div class="header">
         <h1>WealthWatchers Admin</h1>
     </div>
-    <nav>
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('savings_add') }}">Add Savings</a>
-        <a href="{{ url_for('savings_view') }}">Edit Savings</a>
-        <a href="{{ url_for('admin_dashboard')}}">Admin Dashboard</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-
-    </nav>
+    {% include 'navigation_bar.html' %}
     <h2>All Users</h2>
     <table>
         <tr>
