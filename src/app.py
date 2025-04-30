@@ -167,107 +167,56 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/expense/add', methods=['GET', 'POST'])
+@app.route('/event/add', methods=['GET', 'POST'])
 @login_required
-def add_expense():
-    return "<h3>Add Expense (Coming Soon)</h3>"
-
-# Route to add savings
-@app.route('/savings_add', methods=['GET', 'POST'])
-@login_required
-def savings_add():
-
+def add_event():
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
-
     user_id = current_user.user_id
-    # Get categories and accounts associated with the current user
     categories = Category.query.filter_by(user_id=user_id).all()
     accounts = Account.query.filter_by(user_id=user_id).all()
-
     if request.method == 'POST':
-
         amount = Decimal(request.form['amount'])
         category_id = request.form['category_id']
         description = request.form['description']
         date = request.form['date']
         account_id = request.form['account_id']
-
-        new_savings = Saving(
-            amount=amount,
-            description=description,
-            date=date,
-            category_id=category_id,
-            account_id=account_id
-        )
-
+        new_event = Saving(amount=amount, description=description, date=date,
+                           category_id=category_id, account_id=account_id)
         selected_account = Account.query.filter_by(account_id=account_id).first()
-
         if selected_account:
-
-            if selected_account.account_type == 'Asset':
-
+            if selected_account.account_type in ['Asset', 'Liability']:
                 selected_account.balance += amount
-            elif selected_account.account_type == 'Liability':
-
-                selected_account.balance += amount
-
             db.session.commit()
-
-        db.session.add(new_savings)
+        db.session.add(new_event)
         db.session.commit()
-
         return redirect(url_for('home'))
+    return render_template('event_add.html', accounts=accounts, categories=categories)
 
-    # Load the form page with account and category dropdowns
-    return render_template('savings_add.html', accounts=accounts, categories=categories)
-
-@app.route('/savings_edit/<int:savings_id>', methods=['GET', 'POST'])
+@app.route('/event/edit/<int:event_id>', methods=['GET', 'POST'])
 @login_required
-def savings_edit(savings_id):
-
+def edit_event(event_id):
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
-
     user_id = current_user.user_id
-
-    saving = Saving.query.get_or_404(savings_id)
+    event = Saving.query.get_or_404(event_id)
     categories = Category.query.filter_by(user_id=user_id).all()
     accounts = Account.query.filter_by(user_id=user_id).all()
-
     if request.method == 'POST':
-        # Get form data
-        amount = request.form['amount']
-        category_id = request.form['category_id']
-        description = request.form['description']
-        date = request.form['date']
-        account_id = request.form['account_id']
-
-        # Create a new saving record
-        new_savings = Saving(
-            amount=amount,
-            description=description,
-            date=date,
-            category_id=category_id,
-            account_id=account_id
-        )
-
-        # Save the record to the database
-        db.session.add(new_savings)
+        event.amount = request.form['amount']
+        event.category_id = request.form['category_id']
+        event.description = request.form['description']
+        event.date = request.form['date']
+        event.account_id = request.form['account_id']
         db.session.commit()
-
         return redirect(url_for('home'))
+    return render_template('event_edit.html', event=event, categories=categories, accounts=accounts)
 
-    return render_template('savings_edit.html', saving=saving, categories=categories, accounts=accounts)
-
-
-@app.route("/savings")
+@app.route("/events")
 @login_required
-def savings_view():
-    #user_id = 1  # Replace with session later
-    #savings = Saving.query.all()
-    savings = db.session.query(Saving).join(Account).filter(Account.user_id == current_user.user_id).all()
-    return render_template("savings_page.html", savings=savings)
+def events_view():
+    events = db.session.query(Saving).join(Account).filter(Account.user_id == current_user.user_id).all()
+    return render_template("events_page.html", events=events)
 
 @app.route("/account/add", methods=["POST"])
 @login_required
@@ -473,17 +422,6 @@ def mark_as_read(notification_id):
     unread_count = Notification.query.filter_by(user_id=current_user.user_id, is_read=False).count()
 
     return jsonify({'unread_count': unread_count})
-
-# @app.route("/savings")
-# def savings_view():
-#     user_id = 1  # Replace with session later
-#     savings = Saving.query.all()
-#     return render_template("savings_page.html", savings=savings)
-
-# @app.route('/savings/add', methods=['GET', 'POST'])
-# @login_required
-# def savings_add():
-#     return "<h3>Add Savings (Coming Soon)</h3>"
 
 if __name__ == "__main__":
     # app.run(debug=True)
