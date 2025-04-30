@@ -7,6 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from db import db, User, Account, Saving, Category, Expense, Notification
 from forms import LoginForm  # If LoginForm is in forms.py
+from forms import RegisterForm
 from decimal import Decimal
 from functools import wraps
 from datetime import datetime

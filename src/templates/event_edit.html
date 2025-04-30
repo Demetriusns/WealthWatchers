@@ -18,12 +18,22 @@
             <label for="date">Date:</label>
             <input type="date" name="date" value="{{ event.date }}" required>
 
+            <label for="category">Category:</label>
+            <select name="category_id" required>
+                {% for category in categories %}
+                    <option value="{{ category.category_id }}"
+                        { % if event.category_id == category.category_id %}selected{% endif %}>
+                            {{ category.category_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
             <label for="account">Account:</label>
             <select name="account_id" required>
                 {% for account in accounts %}
-                    <option value="{{ account.id }}" {% if event.account_id == account.id %}selected{% endif %}>
-                        {{ account.name }}
-                    </option>
+                <option value="{{ account.account_id }}" {% if event.account_id == account.account_id %}selected{% endif %}>
+                    {{ account.bank_name }}
+                </option>
                 {% endfor %}
             </select>
 

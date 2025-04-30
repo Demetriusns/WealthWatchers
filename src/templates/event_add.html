@@ -18,10 +18,17 @@
             <label for="date">Date:</label>
             <input type="date" name="date" required>
 
+            <label for="category">Category:</label>
+            <select name="category_id" required>
+                {% for category in categories %}
+                    <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+                {% endfor %}
+            </select>
+
             <label for="account">Account:</label>
             <select name="account_id" required>
                 {% for account in accounts %}
-                    <option value="{{ account.id }}">{{ account.name }}</option>
+                    <option value="{{ account.account_id }}">{{ account.bank_name }}</option>
                 {% endfor %}
             </select>
 
