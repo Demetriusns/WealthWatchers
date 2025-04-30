@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WealthWachers - Home Page </title>
+    <title>WealthWatchers - Home Page</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
 </head>
 <body>
@@ -18,32 +18,27 @@
 
         <div class="card">
             <h3>Total Net Worth</h3>
-            <p>${{net_worth}} (Assets - Liabilities)</p>
-            <!-- Replace with dynamic value from database -->
+            <p>${{ net_worth }} (Assets - Liabilities)</p>
         </div>
 
         <div class="card">
             <h3>Total Savings</h3>
-            <p>${{total_assets}}</p>
-            <!-- Replace with dynamic value from database -->
+            <p>${{ total_assets }}</p>
         </div>
 
         <div class="card">
             <h3>Total Debt</h3>
-            <p>${{total_liabilities}}</p>
-            <!-- Replace with dynamic value from database -->
+            <p>${{ total_liabilities }}</p>
         </div>
 
         <div class="card">
             <h3>Percent Saved This Month</h3>
-            <p>XX%</p>
-            <!-- Replace with dynamic value from database -->
+            <p>{{ percent_saved }}%</p>
         </div>
 
         <div class="card">
             <h3>Percent Spent This Month</h3>
-            <p>XX%</p>
-            <!-- Replace with dynamic value from database -->
+            <p>{{ percent_spent }}%</p>
         </div>
 
         <div class="chart-container">
@@ -57,15 +52,15 @@
         </div>
 
         <div class="card">
-            <h3>Your Savings Entries</h3>
+            <h3>Your Financial Events</h3>
             <ul>
-                {% for saving in savings %}
+                {% for event in events %}
                     <li>
-                        ${{ saving.amount }} - {{ saving.description }}
-                        <a href="{{ url_for('savings_edit', savings_id=saving.savings_id) }}">Edit</a>
+                        ${{ event.amount }} - {{ event.description }} on {{ event.date }} ({{ event.account.name }})
+                        <a href="{{ url_for('edit_event', event_id=event.id) }}">Edit</a>
                     </li>
                 {% else %}
-                    <li>No savings recorded yet.</li>
+                    <li>No events recorded yet.</li>
                 {% endfor %}
             </ul>
         </div>

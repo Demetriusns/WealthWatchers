@@ -2,29 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Savings Page</title>
+    <title>Events Page</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='WealthWatchersStyle.css') }}">
 </head>
 <body>
     <div class="header">
-        <h1>All Savings</h1>
+        <h1>All Financial Events</h1>
     </div>
 
     <nav>
         <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('savings_add') }}">Add Savings</a>
+        <a href="{{ url_for('add_event') }}">Add Event</a>
     </nav>
 
     <div class="container">
-        <h2>List of Savings Entries</h2>
+        <h2>List of All Events</h2>
         <ul>
-            {% for saving in savings %}
+            {% for event in events %}
                 <li>
-                    ${{ saving.amount }} - {{ saving.description }}
-                    <a href="{{ url_for('savings_edit', savings_id=saving.savings_id) }}">Edit</a>
+                    ${{ event.amount }} - {{ event.description }} on {{ event.date }} ({{ event.account.name }})
+                    <a href="{{ url_for('edit_event', event_id=event.id) }}">Edit</a>
                 </li>
             {% else %}
-                <li>No savings recorded yet.</li>
+                <li>No events recorded yet.</li>
             {% endfor %}
         </ul>
     </div>
