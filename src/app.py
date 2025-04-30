@@ -11,7 +11,7 @@ from forms import RegisterForm
 from decimal import Decimal
 from functools import wraps
 from datetime import datetime
-from sqlalchemy import func
+from sqlalchemy import func, extract
 
 
 # from flask_wtf import FlaskForm
@@ -42,6 +42,43 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['MYSQL_PASSWORD'] = 'your_password'
 # app.config['MYSQL_DB'] = 'wealth_local'
 
+# Helper function to determine if expenses exceed savings for the month.
+def check_and_create_expense_alert(user_id):
+
+    account_ids = [acc.account_id for acc in Account.query.filter_by(user_id=user_id).all()]
+
+    current_month = datetime.utcnow().month
+    current_year = datetime.utcnow().year
+
+    total_savings = db.session.query(func.sum(Saving.amount)).filter(
+        Saving.account_id.in_(account_ids),
+        extract('month', Saving.date) == current_month,
+        extract('year', Saving.date) == current_year
+    ).scalar() or 0
+
+    total_expenses = db.session.query(func.sum(Expense.amount)).filter(
+        Expense.account_id.in_(account_ids),
+        extract('month', Expense.date) == current_month,
+        extract('year', Expense.date) == current_year
+    ).scalar() or 0
+
+    # Check if notification already exists
+    existing_alert = Notification.query.filter_by(user_id=user_id, title="Expense Alert").filter(
+        extract('month', Notification.timestamp) == current_month,
+        extract('year', Notification.timestamp) == current_year
+    ).first()
+
+    # Create only if needed
+    if total_expenses > total_savings and not existing_alert:
+        notification = Notification(
+             user_id=user_id,
+             title="Expense Alert",
+             message=f"Alert: Your total expenses this month (${total_expenses:,.2f}) have exceeded your savings (${total_savings:,.2f}). Please review your spending.",
+             timestamp=datetime.utcnow()
+        )
+        db.session.add(notification)
+        db.session.commit()
+
 db.init_app(app)
 
 login_manager = LoginManager(app)
@@ -57,12 +94,6 @@ def load_user(user_id):
 # def load_user(email):
 #     return User.query.filter_by(email=email).first()
 
-# TODO: Replace this route with the actual login page once implemented
-# '''
-# @app.route("/")
-# def login():
-#     return render_template("login.html")
-# '''
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -89,16 +120,13 @@ def login():
 @app.route("/home")
 @login_required
 def home():
-
-    #if "user_id" not in session:
-    #        return redirect(url_for("login"))
-
-    # TODO: Replace hardcoded user_id with session["user_id"] once login is implemente
-
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
 
     user_id = current_user.user_id
+
+    # For testing the notification system
+    check_and_create_expense_alert(user_id)
 
     unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
 
@@ -371,41 +399,8 @@ def delete_user(user_id):
 def notifications():
     user_id = current_user.user_id
 
-    # Fetch notifications for the user
     notifications = Notification.query.filter_by(user_id=user_id).order_by(Notification.timestamp.desc()).all()
-
-    # Get the unread notification count
     unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
-
-    # Get all account_ids for the current user
-    account_ids = db.session.query(Account.account_id).filter_by(user_id=user_id).all()
-    account_ids = [account_id[0] for account_id in account_ids]  # Extracting account_ids into a list
-
-    # Get total savings for the current month (from all accounts associated with the user)
-    total_savings = db.session.query(func.sum(Saving.amount)).filter(
-        Saving.account_id.in_(account_ids),  # Filter by all account_ids for the user
-        db.extract('month', Saving.date) == db.extract('month', func.current_date())
-    ).scalar() or 0
-
-    # Get total expenses for the current month (from all accounts associated with the user)
-    total_expenses = db.session.query(func.sum(Expense.amount)).filter(
-        Expense.account_id.in_(account_ids),  # Filter by all account_ids for the user
-        db.extract('month', Expense.date) == db.extract('month', func.current_date())
-    ).scalar() or 0
-
-    # If expenses exceed savings, create a notification
-    if total_expenses > total_savings:
-        notification = Notification(
-            user_id=user_id,
-            title="Expense Alert",
-            message="Your expenses have exceeded your savings for this month!",
-            timestamp=datetime.utcnow()
-        )
-        db.session.add(notification)
-        db.session.commit()
-
-    # Fetch notifications for the user
-    notifications = Notification.query.filter_by(user_id=user_id).order_by(Notification.timestamp.desc()).all()
 
     return render_template('notification.html', notifications=notifications, unread_count=unread_count)
 

@@ -6,6 +6,11 @@
         <a href="{{ url_for('account_manage') }}">Manage Accounts</a>
         <a href="{{ url_for('category_manage') }}">Categories</a>
         <a href="{{ url_for('admin_dashboard')}}">Admin Dashboard</a>
-        <a href="{{ url_for('notifications') }}">Notifications <span id="unread-count">{{ unread_count }}</span></a>
+        <a href="{{ url_for('notifications') }}">
+          Notifications
+          <span id="unread-count" class="notification-badge {% if unread_count > 0 %}active{% endif %}">
+            {{ unread_count }}
+          </span>
+        </a>
         <a href="{{ url_for('logout') }}">Logout</a>
     </nav>

@@ -4,8 +4,15 @@ function markAsRead(notification_id) {
         })
         .then(response => response.json())
         .then(data => {
-            // Update the unread notification count in the navbar
-            document.getElementById('unread-count').textContent = data.unread_count;
+          
+          const unreadCountSpan = document.getElementById('unread-count');
+          unreadCountSpan.textContent = data.unread_count;
+
+          if (data.unread_count > 0) {
+            unreadCountSpan.classList.add('active');
+          } else {
+            unreadCountSpan.classList.remove('active');
+          }
 
             // Optionally, hide or mark the notification as read on the page
             const notificationElement = document.getElementById(`notification-${notification_id}`);
