@@ -270,6 +270,20 @@ table th {
     }
 }
 
+.notification-badge {
+    background-color: gray;
+    color: white;
+    border-radius: 50%;
+    padding: 3px 7px;
+    font-size: 0.8em;
+    margin-left: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.notification-badge.active {
+    background-color: red;
+    font-weight: bold;
+}
 /*Responseive Design*/
 @media (max-width: 768px) {
     nav {
