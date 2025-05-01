@@ -21,7 +21,7 @@
             {% for event in events %}
                 <li>
                     ${{ event.amount }} - {{ event.description }} on {{ event.date }} ({{ event.account.name }})
-                    <a href="{{ url_for('edit_event', event_id=event.id) }}">Edit</a>
+                    <a href="{{ url_for('edit_event', event_id=event.savings_id) }}">Edit</a>
                 </li>
             {% else %}
                 <li>No events recorded yet.</li>
