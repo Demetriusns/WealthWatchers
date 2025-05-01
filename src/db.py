@@ -98,3 +98,13 @@ class Notification(db.Model):
 
     def __repr__(self):
         return f"<Notification {self.notification_id} - User {self.user_id}>"
+
+class ChatHistory(db.Model):
+    __tablename__ = 'chat_history'
+    chat_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    question = db.Column(db.Text, nullable=False)
+    response = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='chat_history')
