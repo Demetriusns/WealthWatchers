@@ -61,25 +61,24 @@ def check_and_create_expense_alert(user_id):
         extract('year', Expense.date) == current_year
     ).scalar() or 0
 
-    # Check if notification already exists
     existing_alert = Notification.query.filter_by(user_id=user_id, title="Expense Alert").filter(
         extract('month', Notification.timestamp) == current_month,
         extract('year', Notification.timestamp) == current_year
     ).first()
 
     if existing_alert:
-        # Compare if total expenses have increased since last alert
-        if abs(total_expenses) > existing_alert.last_expense_total:
+        # Use 0 as fallback if last_expense_total is None
+        previous_total = existing_alert.last_expense_total or 0
+        if abs(total_expenses) > previous_total:
             existing_alert.message = (
                 f"Alert: Your total expenses this month (${abs(total_expenses):,.2f}) "
                 f"have exceeded your savings (${total_savings:,.2f}). Please review your spending."
             )
             existing_alert.timestamp = datetime.utcnow()
             existing_alert.last_expense_total = abs(total_expenses)
-            existing_alert.is_read = 0
+            existing_alert.is_read = False
             db.session.commit()
     else:
-        # Create first alert
         notification = Notification(
             user_id=user_id,
             title="Expense Alert",
@@ -88,7 +87,8 @@ def check_and_create_expense_alert(user_id):
                 f"have exceeded your savings (${total_savings:,.2f}). Please review your spending."
             ),
             timestamp=datetime.utcnow(),
-            last_expense_total=abs(total_expenses)
+            last_expense_total=abs(total_expenses),
+            is_read=False
         )
         db.session.add(notification)
         db.session.commit()
