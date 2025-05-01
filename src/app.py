@@ -44,7 +44,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Helper function to determine if expenses exceed savings for the month.
 def check_and_create_expense_alert(user_id):
-
     account_ids = [acc.account_id for acc in Account.query.filter_by(user_id=user_id).all()]
 
     current_month = datetime.utcnow().month
@@ -68,13 +67,28 @@ def check_and_create_expense_alert(user_id):
         extract('year', Notification.timestamp) == current_year
     ).first()
 
-    # Create only if needed
-    if total_expenses > total_savings and not existing_alert:
+    if existing_alert:
+        # Compare if total expenses have increased since last alert
+        if abs(total_expenses) > existing_alert.last_expense_total:
+            existing_alert.message = (
+                f"Alert: Your total expenses this month (${abs(total_expenses):,.2f}) "
+                f"have exceeded your savings (${total_savings:,.2f}). Please review your spending."
+            )
+            existing_alert.timestamp = datetime.utcnow()
+            existing_alert.last_expense_total = abs(total_expenses)
+            existing_alert.is_read = 0
+            db.session.commit()
+    else:
+        # Create first alert
         notification = Notification(
-             user_id=user_id,
-             title="Expense Alert",
-             message=f"Alert: Your total expenses this month (${total_expenses:,.2f}) have exceeded your savings (${total_savings:,.2f}). Please review your spending.",
-             timestamp=datetime.utcnow()
+            user_id=user_id,
+            title="Expense Alert",
+            message=(
+                f"Alert: Your total expenses this month (${abs(total_expenses):,.2f}) "
+                f"have exceeded your savings (${total_savings:,.2f}). Please review your spending."
+            ),
+            timestamp=datetime.utcnow(),
+            last_expense_total=abs(total_expenses)
         )
         db.session.add(notification)
         db.session.commit()
@@ -124,9 +138,6 @@ def home():
         return redirect(url_for("login"))
 
     user_id = current_user.user_id
-
-    # For testing the notification system
-    check_and_create_expense_alert(user_id)
 
     unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
 
@@ -201,25 +212,42 @@ def logout():
 def add_event():
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
+
     user_id = current_user.user_id
     categories = Category.query.filter_by(user_id=user_id).all()
     accounts = Account.query.filter_by(user_id=user_id).all()
+
     if request.method == 'POST':
         amount = Decimal(request.form['amount'])
         category_id = request.form['category_id']
         description = request.form['description']
         date = request.form['date']
         account_id = request.form['account_id']
-        new_event = Saving(amount=amount, description=description, date=date,
-                           category_id=category_id, account_id=account_id)
+
         selected_account = Account.query.filter_by(account_id=account_id).first()
-        if selected_account:
-            if selected_account.account_type in ['Asset', 'Liability']:
+
+
+        if selected_account and selected_account.account_type in ['Asset', 'Liability']:
+            if selected_account.account_type == 'Asset':
+                selected_account.balance += amount
+            elif selected_account.account_type == 'Liability':
                 selected_account.balance += amount
             db.session.commit()
-        db.session.add(new_event)
+
+        # Save to the appropriate table
+        if amount >= 0:
+            new_event = Saving(amount=amount, description=description, date=date,
+                               category_id=category_id, account_id=account_id)
+            db.session.add(new_event)
+        else:
+            new_event = Expense(amount=amount, description=description, date=date,
+                                category_id=category_id, account_id=account_id)
+            db.session.add(new_event)
+
         db.session.commit()
+        check_and_create_expense_alert(user_id)
         return redirect(url_for('home'))
+
     return render_template('event_add.html', accounts=accounts, categories=categories)
 
 @app.route('/event/edit/<int:event_id>', methods=['GET', 'POST'])
