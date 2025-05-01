@@ -92,6 +92,7 @@ class Notification(db.Model):
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     is_read = db.Column(db.Boolean, default=False)
+    last_expense_total = db.Column(db.Numeric(10, 2))
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
