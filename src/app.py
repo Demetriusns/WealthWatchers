@@ -42,6 +42,35 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['MYSQL_PASSWORD'] = 'your_password'
 # app.config['MYSQL_DB'] = 'wealth_local'
 
+import openai  # Make sure you have openai installed
+
+openai.api_key = "your_openai_api_key_here"
+
+@app.route("/chat", methods=["POST"])
+@login_required
+def chat():
+    data = request.get_json()
+    question = data.get("message")
+
+    try:
+        # Call OpenAI API
+        completion = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": question}]
+        )
+        answer = completion.choices[0].message.content.strip()
+
+        # Save to DB
+        chat_entry = ChatHistory(user_id=current_user.user_id, question=question, response=answer)
+        db.session.add(chat_entry)
+        db.session.commit()
+
+        return jsonify({"response": answer})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 # Helper function to determine if expenses exceed savings for the month.
 def check_and_create_expense_alert(user_id):
     account_ids = [acc.account_id for acc in Account.query.filter_by(user_id=user_id).all()]

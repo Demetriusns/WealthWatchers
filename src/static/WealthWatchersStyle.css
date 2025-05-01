@@ -317,3 +317,55 @@ table th {
     visibility: hidden;
   }
 }
+
+#chat-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #004085;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    z-index: 999;
+}
+
+#chat-box {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    width: 300px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 999;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+#chat-messages {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.user-msg, .ai-msg {
+    margin: 5px 0;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.user-msg {
+    background: #e9f7ef;
+    text-align: right;
+}
+
+.ai-msg {
+    background: #f1f1f1;
+    text-align: left;
+}
+
+#error-msg {
+    color: red;
+}
+
