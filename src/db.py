@@ -12,6 +12,8 @@ class User(db.Model, UserMixin):
     create_time = db.Column(db.String(20), nullable=False)
     role = db.Column(db.Enum('Admin', 'User', name='user_roles'), nullable=False, default='User')
     is_admin = db.Column(db.Boolean, default=False)
+    reset_token = db.Column(db.String(120), nullable=True)
+
     def __repr__(self):
         return f"<User {self.email}, Role: {self.role}>"
 

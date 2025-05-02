@@ -12,6 +12,8 @@ class User(db.Model, UserMixin):
     firstname = db.Column(db.String(20)) 
     lastname = db.Column(db.String(20)) 
     is_admin = db.Column(db.Boolean, default=False) 
+    reset_token = db.Column(db.String(120), nullable=True)
+
 
     # def get_id(self):
     #     return str(self.email)
