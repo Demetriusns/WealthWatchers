@@ -1,3 +1,4 @@
+import uuid
 from flask import Flask, render_template, session, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -10,7 +11,7 @@ from forms import LoginForm  # If LoginForm is in forms.py
 from forms import RegisterForm
 from decimal import Decimal
 from functools import wraps
-from datetime import datetime
+#from datetime import datetime
 from sqlalchemy import func, extract
 
 
@@ -446,6 +447,42 @@ def mark_as_read(notification_id):
     unread_count = Notification.query.filter_by(user_id=current_user.user_id, is_read=False).count()
 
     return jsonify({'unread_count': unread_count})
+
+# @app.route('/admin')
+# @login_required
+# @admin_required
+# def admin_dashboard():
+#     users = User.query.all()
+#     return render_template('admin.html', users=users)
+
+# @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+# @login_required
+# @admin_required
+# def delete_user(user_id):
+#     user = User.query.get(user_id)
+#     if user:
+#         db.session.delete(user)
+#         db.session.commit()
+#         flash(f"User '{user.email}' has been deleted.", "success")
+#     else:
+#         flash("User not found.", "warning")
+#     return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def toggle_admin(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if user.email == current_user.email:
+        flash("You cannot change your own admin status.", "warning")
+        return redirect(url_for('admin_dashboard'))
+
+    user.is_admin = not user.is_admin
+    db.session.commit()
+    flash(f"Admin status updated for {user.email}", "success")
+    return redirect(url_for('admin_dashboard'))
+
 
 if __name__ == "__main__":
     # app.run(debug=True)
