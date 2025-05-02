@@ -5,7 +5,9 @@
         <a href="{{ url_for('events_view') }}">View/Edit Events</a>
         <a href="{{ url_for('account_manage') }}">Manage Accounts</a>
         <a href="{{ url_for('category_manage') }}">Categories</a>
-        <a href="{{ url_for('admin_dashboard')}}">Admin Dashboard</a>
+        {% if current_user.is_authenticated and current_user.is_admin %}    
+          <a href="{{ url_for('admin_dashboard')}}">Admin</a>
+        {% endif %}
         <a href="{{ url_for('notifications') }}">
           Notifications
           <span id="unread-count" class="notification-badge {% if unread_count > 0 %}active{% endif %}">
