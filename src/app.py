@@ -58,9 +58,13 @@ mail = Mail(app)
 # app.config['MYSQL_PASSWORD'] = 'your_password'
 # app.config['MYSQL_DB'] = 'wealth_local'
 
-import openai  # Make sure you have openai installed
+from openai import OpenAI
 
-openai.api_key = "your_openai_api_key_here"
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/chat", methods=["POST"])
 @login_required
@@ -70,11 +74,14 @@ def chat():
 
     try:
         # Call OpenAI API
-        completion = openai.ChatCompletion.create(
+        client = openai.OpenAI()  # Uses env variable or ~/.config/openai config
+
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": question}]
         )
-        answer = completion.choices[0].message.content.strip()
+        answer = response.choices[0].message.content.strip()
+
 
         # Save to DB
         chat_entry = ChatHistory(user_id=current_user.user_id, question=question, response=answer)
