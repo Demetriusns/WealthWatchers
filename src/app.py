@@ -74,7 +74,7 @@ def chat():
 
     try:
         # Call OpenAI API
-        client = openai.OpenAI()  # Uses env variable or ~/.config/openai config
+        client = OpenAI() # Uses env variable or ~/.config/openai config
 
         response = client.chat.completions.create(
             model="gpt-4",
