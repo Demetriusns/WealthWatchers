@@ -73,13 +73,11 @@ class Expense(db.Model):
     amount = db.Column(db.Numeric(15, 2), nullable=False)
     description = db.Column(db.String(255), nullable=True)
     date = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.current_timestamp())
+    
     category_id = db.Column(db.Integer, db.ForeignKey('categories.category_id'), nullable=True)
     account_id = db.Column(db.Integer, db.ForeignKey('accounts.account_id'), nullable=False)
 
-
     category = db.relationship('Category', backref='expenses', lazy=True)
-
-
     account = db.relationship('Account', backref='expenses', lazy=True)
 
     def __repr__(self):

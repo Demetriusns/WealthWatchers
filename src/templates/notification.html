@@ -21,7 +21,7 @@
                 <strong>{{ n.title }}</strong>
                 <span class="timestamp">({{ n.timestamp.strftime('%Y-%m-%d %H:%M') }})</span>
               </div>
-              <p class="message">{{ n.message }}</p>
+              <p class="message">{{ n.message|safe }}</p>
               {% if not n.is_read %}
               <button class="mark-read-btn" onclick="markAsRead({{ n.notification_id }})">Mark as Read</button>
               {% endif %}

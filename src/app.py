@@ -1,4 +1,7 @@
 import uuid
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from datetime import datetime, timedelta
 from flask import Flask, render_template, session, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -13,7 +16,7 @@ from forms import RegisterForm
 from decimal import Decimal
 from functools import wraps
 #from datetime import datetime
-from sqlalchemy import func, extract
+from sqlalchemy import func, extract, and_
 
 
 # from flask_wtf import FlaskForm
@@ -30,6 +33,7 @@ app = Flask(__name__)
 
 import secrets
 app.secret_key = secrets.token_hex(16)  # This generates a 32-character hex string
+scheduler = BackgroundScheduler()
 
 # Database configuration
 app.config['SECRET_KEY'] = app.secret_key
@@ -147,6 +151,77 @@ def check_and_create_expense_alert(user_id):
             )
             db.session.add(notification)
             db.session.commit()
+
+def get_week_range(reference_date=None):
+    if reference_date is None:
+        reference_date = datetime.utcnow()
+
+    weekday = reference_date.isoweekday() % 7
+    start_of_week = reference_date - timedelta(days=weekday)
+    start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    end_of_week = start_of_week + timedelta(days=6, hours=23, minutes=59, seconds=59)
+
+    return start_of_week, end_of_week
+
+# Helper function for weekely notification
+def send_weekly_summary():
+    start_of_week, end_of_week = get_week_range()
+
+    users = User.query.all()
+
+    for user in users:
+        accounts = Account.query.filter_by(user_id=user.user_id).all()
+        account_ids = [account.account_id for account in accounts]
+
+        savings = Saving.query.filter(
+            and_(
+                Saving.account_id.in_(account_ids),
+                Saving.date >= start_of_week,
+                Saving.date <= end_of_week
+            )
+        ).all()
+
+        expenses = Expense.query.filter(
+            and_(
+                Expense.account_id.in_(account_ids),
+                Expense.date >= start_of_week,
+                Expense.date <= end_of_week
+            )
+        ).all()
+
+        if not savings and not expenses:
+            continue  # Skip users with no activity
+
+        savings_summary = "<br>".join([f"- ${s.amount} on {s.date.strftime('%Y-%m-%d')}" for s in savings])
+        expenses_summary = "<br>".join([f"- ${e.amount} on {e.date.strftime('%Y-%m-%d')}" for e in expenses])
+
+        week_range = f"{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d')}"
+        message = f"""Here is your weekly summary for <strong>{week_range}</strong>:<br><br>
+
+        💰 <strong>Savings:</strong><br>
+        {savings_summary if savings_summary else "No savings this week."}<br><br>
+
+        💸 <strong>Expenses:</strong><br>
+        {expenses_summary if expenses_summary else "No expenses this week."}
+        """
+
+        notification = Notification(
+            user_id=user.user_id,
+            title="Weekly Financial Summary",
+            message=message,
+            is_read=False
+        )
+        db.session.add(notification)
+
+    db.session.commit()
+
+def schedule_weekly_summary():
+    send_weekly_summary()
+
+scheduler.add_job(schedule_weekly_summary, CronTrigger(day_of_week='sun', hour=0, minute=0, second=0))
+
+
 
 db.init_app(app)
 
@@ -518,6 +593,12 @@ def delete_notification(notification_id):
         return jsonify({"success": True, "unread_count": unread_count})
     else:
         return jsonify({"success": False, "error": "Notification not found"}), 404
+# This is for testing purposes. Use the link http://100.15.171.64:5000/test_weekly_summary and refresh notification page.
+# This should genearate a message.
+@app.route("/test_weekly_summary")
+def test_weekly_summary():
+    send_weekly_summary()
+    return "Weekly summary notifications generated successfully!"
 
 # @app.route('/admin')
 # @login_required
@@ -613,5 +694,6 @@ def reset_password(token):
 
 
 if __name__ == "__main__":
+    scheduler.start()
     # app.run(debug=True)
     app.run(host="0.0.0.0", port=5000, debug=True)
