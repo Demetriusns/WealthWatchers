@@ -93,7 +93,7 @@ def chat():
         return jsonify({"error": str(e)}), 500
 
 
-
+# Helper function for the notification system.
 def check_and_create_expense_alert(user_id):
     account_ids = [acc.account_id for acc in Account.query.filter_by(user_id=user_id).all()]
 
@@ -112,13 +112,16 @@ def check_and_create_expense_alert(user_id):
         extract('year', Expense.date) == current_year
     ).scalar() or 0
 
+
+    if abs(total_expenses) == 0 and total_savings == 0:
+        return
+
     existing_alert = Notification.query.filter_by(user_id=user_id, title="Expense Alert").filter(
         extract('month', Notification.timestamp) == current_month,
         extract('year', Notification.timestamp) == current_year
     ).first()
 
     if existing_alert:
-        # Use 0 as fallback if last_expense_total is None
         previous_total = existing_alert.last_expense_total or 0
         if abs(total_expenses) > previous_total:
             existing_alert.message = (
@@ -144,7 +147,7 @@ def check_and_create_expense_alert(user_id):
             )
             db.session.add(notification)
             db.session.commit()
-            
+
 db.init_app(app)
 
 login_manager = LoginManager(app)
