@@ -94,7 +94,6 @@ def chat():
 
 
 
-# Helper function to determine if expenses exceed savings for the month.
 def check_and_create_expense_alert(user_id):
     account_ids = [acc.account_id for acc in Account.query.filter_by(user_id=user_id).all()]
 
@@ -131,20 +130,21 @@ def check_and_create_expense_alert(user_id):
             existing_alert.is_read = False
             db.session.commit()
     else:
-        notification = Notification(
-            user_id=user_id,
-            title="Expense Alert",
-            message=(
-                f"Alert: Your total expenses this month (${abs(total_expenses):,.2f}) "
-                f"have exceeded your savings (${total_savings:,.2f}). Please review your spending."
-            ),
-            timestamp=datetime.utcnow(),
-            last_expense_total=abs(total_expenses),
-            is_read=False
-        )
-        db.session.add(notification)
-        db.session.commit()
-
+        if abs(total_expenses) > total_savings:
+            notification = Notification(
+                user_id=user_id,
+                title="Expense Alert",
+                message=(
+                    f"Alert: Your total expenses this month (${abs(total_expenses):,.2f}) "
+                    f"have exceeded your savings (${total_savings:,.2f}). Please review your spending."
+                ),
+                timestamp=datetime.utcnow(),
+                last_expense_total=abs(total_expenses),
+                is_read=False
+            )
+            db.session.add(notification)
+            db.session.commit()
+            
 db.init_app(app)
 
 login_manager = LoginManager(app)
@@ -555,8 +555,8 @@ def forgot_password():
             # msg = Message("Test from Flask",
             #       recipients=["recipient@example.com"],
             #       body="This is a test email sent using Yahoo SMTP.")
-            
-            
+
+
             msg = Message("Password Reset Request", recipients=[email])
             msg.body = f"To reset your password, click the following link: {reset_link}\nIf you did not request this, please ignore this email."
             #msg.body = f"To reset your password, click the following link: {reset_link}\nIf you did not request this, please ignore this email."
@@ -577,7 +577,7 @@ def reset_password(token):
     if request.method == 'POST':
         new_password = request.form['password']
         user = User.query.filter_by(reset_token=token).first()
-        
+
         if user:
             user.password = generate_password_hash(new_password)
             user.reset_token = None  # Clear the reset token after successful reset
