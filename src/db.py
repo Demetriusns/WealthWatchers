@@ -89,7 +89,6 @@ class Notification(db.Model):
     __tablename__ = 'notifications'  # match your SQL table name
 
     notification_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to User table
     title = db.Column(db.String(255), nullable=False)
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)

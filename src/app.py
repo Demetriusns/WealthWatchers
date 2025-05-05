@@ -502,6 +502,23 @@ def mark_as_read(notification_id):
 
     return jsonify({'unread_count': unread_count})
 
+
+@app.route("/delete_notification/<int:notification_id>", methods=["DELETE"])
+@login_required
+def delete_notification(notification_id):
+    notification = Notification.query.filter_by(notification_id=notification_id, user_id=current_user.user_id).first()
+    if notification:
+        is_unread = not notification.is_read
+        db.session.delete(notification)
+        db.session.commit()
+
+        # Get updated unread count
+        unread_count = Notification.query.filter_by(user_id=current_user.user_id, is_read=False).count()
+
+        return jsonify({"success": True, "unread_count": unread_count})
+    else:
+        return jsonify({"success": False, "error": "Notification not found"}), 404
+
 # @app.route('/admin')
 # @login_required
 # @admin_required

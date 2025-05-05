@@ -248,6 +248,19 @@ table th {
     background-color: #52796f;
 }
 
+.delete-btn {
+    background-color: #354f52;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #52796f;
+}
+
 /* Hover effect for cards */
 .notification-card:hover {
     transform: translateY(-5px);
@@ -368,4 +381,3 @@ table th {
 #error-msg {
     color: red;
 }
-
