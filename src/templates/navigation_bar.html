@@ -6,7 +6,13 @@
         <a href="{{ url_for('account_manage') }}">Manage Accounts</a>
         <a href="{{ url_for('category_manage') }}">Categories</a>
         {% if current_user.is_authenticated and current_user.is_admin %}    
-          <a href="{{ url_for('admin_dashboard')}}">Admin</a>
+          <a href="{{ url_for('admin_dashboard')}}">Admin</a>       
+        {% endif %}
+        {% if request.path == '/accounts' %}
+        <a href="{{ url_for('delete_user_account', user_id=current_user.user_id )}}"
+          onclick="return confirmDelete();">
+          Delete User
+        </a>
         {% endif %}
         <a href="{{ url_for('notifications') }}">
           Notifications
@@ -16,3 +22,8 @@
         </a>
         <a href="{{ url_for('logout') }}">Logout</a>
     </nav>
+    <script>
+      function confirmDelete() {
+          return confirm("Are you sure you want to delete this account? This action cannot be undone.");
+      }
+    </script>

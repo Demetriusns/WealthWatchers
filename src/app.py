@@ -249,6 +249,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            flash('No account found with that email.','danger')
+            return redirect(url_for('login'))
+        
         print("User get_id():", user)
         print("User Password:", user.password)
         if user.email and check_password_hash(user.password, form.password.data):
@@ -538,6 +542,21 @@ def admin_dashboard():
     users = User.query.all()
     return render_template('admin.html', users=users)
 
+@app.route('/delete_user/<int:user_id>', methods=['POST', 'GET'])
+@login_required
+def delete_user_account(user_id):
+    user = User.query.get(user_id)
+    if user:
+        Category.query.filter_by(user_id=user_id).delete()
+        db.session.delete(user)
+        db.session.commit()
+
+        logout_user()
+        flash(f"User '{user.email}' has been deleted.", "success")
+    else:
+        flash("User not found.", "warning")
+    return redirect(url_for('login'))
+
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
@@ -561,7 +580,6 @@ def notifications():
     unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
 
     return render_template('notification.html', notifications=notifications, unread_count=unread_count)
-
 
 @app.route('/mark_as_read/<int:notification_id>', methods=['POST'])
 @login_required
