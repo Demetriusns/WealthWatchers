@@ -448,7 +448,7 @@ def delete_account(account_id):
 
 
     Saving.query.filter_by(account_id=account_id).delete()
-
+    Expense.query.filter_by(account_id=account_id).delete()
 
     db.session.delete(account)
     db.session.commit()
